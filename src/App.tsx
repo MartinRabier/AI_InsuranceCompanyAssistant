@@ -71,11 +71,14 @@ export default function App() {
       {/* Header */}
       <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 shadow-sm z-10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <div className="w-4 h-4 border-2 border-white rounded-full border-t-transparent"></div>
-          </div>
+          
+          <img
+            src="https://www.groupama.com/app/uploads/2015/05/GRP_CR_GRAA_VER_VERT_RVB.png"
+            alt="CerIAse Logo"
+            className="w-10 h-10 rounded-lg object-cover"
+          />
           <h1 className="text-xl font-bold tracking-tight text-slate-800">
-            SafeGuard AI <span className="text-xs font-medium text-slate-400 ml-2 uppercase tracking-widest hidden sm:inline">v2.4 - RAG Engine</span>
+            CerIAse <span className="text-xs font-medium text-slate-400 ml-2 uppercase tracking-widest hidden sm:inline">v0.4 - RAG Engine</span>
           </h1>
         </div>
         <div className="flex items-center gap-4">
@@ -124,13 +127,13 @@ export default function App() {
                   }}
                   className="relative flex items-center justify-center"
                 >
-                  <div className="absolute inset-0 bg-indigo-500 rounded-full blur-[40px] opacity-10"></div>
+                  <div className="absolute inset-0 bg-emerald-500 rounded-full blur-[40px] opacity-20"></div>
                   <div
-                    className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-indigo-50 via-indigo-100 to-white shadow-[0_0_30px_rgba(79,70,229,0.15)] border border-indigo-200 flex items-center justify-center ${
+                    className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-green-50 via-emerald-100 to-white shadow-[0_0_30px_rgba(16,185,129,0.20)] border border-emerald-200 flex items-center justify-center ${
                       status === "thinking" ? "animate-pulse-slow" : ""
                     }`}
                   >
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-500 to-indigo-400 shadow-inner flex items-center justify-center">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-green-600 via-emerald-500 to-green-400 shadow-inner flex items-center justify-center">
                       <Mic className="text-white opacity-90" size={24} />
                     </div>
                   </div>
@@ -189,14 +192,14 @@ export default function App() {
                 <button
                   onClick={() => handleSend(inputText)}
                   disabled={!inputText.trim() || status === "thinking"}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-[#07c31a] text-white rounded shadow hover:bg-[#06a617] disabled:opacity-50 transition-colors"
                 >
                   <Send size={16} />
                 </button>
               </div>
               <button
                 onClick={() => {/* Voice simulation hook */}}
-                className="px-4 py-2 bg-white text-indigo-600 font-bold border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-colors flex items-center justify-center shrink-0 uppercase tracking-wider text-xs hidden sm:flex"
+                className="px-4 py-2 bg-white text-[#07c31a] font-bold border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-colors flex items-center justify-center shrink-0 uppercase tracking-wider text-xs hidden sm:flex"
                 title="Voice input (mocked by text for demo)"
               >
                 <Mic className="mr-2" size={16} /> Push to Talk
@@ -216,11 +219,18 @@ export default function App() {
             >
               <div className="flex flex-col gap-6 overflow-y-auto h-full pb-4 hide-scrollbar w-[20rem] p-1">
                 
+                
                 {/* RAG Engine */}
-                <div className="bg-indigo-900 rounded-xl p-5 text-white shadow-xl flex flex-col shrink-0">
-                  <h3 className="text-xs font-bold text-indigo-300 uppercase mb-4 tracking-wider">RAG Engine Reasoning</h3>
-                  <div className="bg-indigo-800/50 p-3 rounded-lg border border-indigo-700/50">
-                    <p className="text-[10px] text-indigo-400 font-bold uppercase mb-1">Knowledge Context</p>
+                <div className="bg-emerald-900 rounded-xl p-5 text-white shadow-xl flex flex-col shrink-0">
+                  <h3 className="text-xs font-bold text-emerald-300 uppercase mb-4 tracking-wider">
+                  RAG Engine Reasoning
+                  </h3>
+
+                  <div className="bg-emerald-800/50 p-3 rounded-lg border border-emerald-700/50">
+                    <p className="text-[10px] text-emerald-400 font-bold uppercase mb-1">
+                      Knowledge Context
+                    </p>
+
                     <p className="text-xs leading-relaxed italic opacity-80">
                       - Homeowners limits: $300k, $2k per electronics.<br/>
                       - VPP policy for items &gt; $5k.<br/>
@@ -228,7 +238,6 @@ export default function App() {
                     </p>
                   </div>
                 </div>
-
                 {/* Testing Suite */}
                 <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm shrink-0">
                   <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider flex items-center gap-2">
