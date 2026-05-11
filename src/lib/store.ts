@@ -1,6 +1,7 @@
 export type Contract = {
   id: string;
   type: string;
+  category?: string;
   coverageLimit: number;
   deductible: number;
   active: boolean;
@@ -45,22 +46,66 @@ class Store {
   };
 
   getBelongingsWithCoverage = (): BelongingWithCoverage[] => {
-    const hasHomeowners = this.state.contracts.some(c => c.type.includes("Homeowners"));
-    const jewelryContractLimit = this.state.contracts.filter(c => c.type.includes("Jewelry")).reduce((sum, c) => sum + c.coverageLimit, 0);
+    const hasHomeowners = this.state.contracts.some(c => c.type.toLowerCase().includes("home"));
+    
+    // Dynamically calculate specific coverage per category
+    const categoryLimits: Record<string, number> = {};
+    for (const c of this.state.contracts) {
+       const typeLower = c.type.toLowerCase();
+       // If it's a specific item/category policy (not general homeowners)
+       if (!typeLower.includes("home")) {
+          const matchedCats = new Set<string>();
+          if (c.category) {
+            matchedCats.add(c.category.toLowerCase());
+          } else {
+            for (const b of this.state.belongings) {
+               const catLower = b.category.toLowerCase();
+               const cleanType = typeLower.replace('policy', '').replace('standalone', '').replace('valuable personal property', '').replace(/[^\w\s]/g, '').trim();
+               
+               // Match category if it's explicitly named in the policy type
+               if (typeLower.includes(catLower) || catLower.includes(cleanType) || cleanType.includes(catLower)) {
+                   matchedCats.add(catLower);
+               }
+            }
+          }
+          // Apply this contract's limit to all matching categories
+          for (const cat of matchedCats) {
+             categoryLimits[cat] = (categoryLimits[cat] || 0) + c.coverageLimit;
+          }
+       }
+    }
+
+    // Determine total value per category to see if limits are breached
+    const categoryTotals: Record<string, number> = {};
+    for (const b of this.state.belongings) {
+       const catLower = b.category.toLowerCase();
+       categoryTotals[catLower] = (categoryTotals[catLower] || 0) + b.value;
+    }
 
     return this.state.belongings.map(b => {
       let status: CoverageStatus = 'not_covered';
+      const catLower = b.category.toLowerCase();
       
-      if (b.category === 'Jewelry') {
-         if (jewelryContractLimit >= b.value) status = 'covered';
-         else if (jewelryContractLimit > 0) status = 'partial';
-      } else {
-         // Default logic for other things falling under Homeowners (capped at $2000 normally)
-         if (hasHomeowners) {
-           if (b.value <= 2000) status = 'covered';
-           else status = 'partial';
+      const specificLimit = categoryLimits[catLower] || 0;
+      const totalCatValue = categoryTotals[catLower] || 0;
+      
+      if (specificLimit > 0) {
+         if (specificLimit >= totalCatValue) {
+            status = 'covered';
+         } else {
+            status = 'partial'; // Limit exceeded for this category's total value
+         }
+      } else if (hasHomeowners) {
+         // Fallback default homeowners rules based on internal docs
+         if (catLower === "jewelry" && b.value > 5000) {
+            status = 'not_covered'; // Must be scheduled
+         } else if (b.value <= 2000) {
+            status = 'covered'; // Standard limits for items
+         } else {
+            status = 'partial'; // Exceeds standard per-item limit
          }
       }
+
       return { ...b, coverageStatus: status };
     });
   }
@@ -84,6 +129,7 @@ class Store {
         {
           id: "POL-Jewelry-5441",
           type: "Valuable Personal Property (Jewelry)",
+          category: "Jewelry",
           coverageLimit: 5000,
           deductible: 0,
           active: true,
@@ -124,13 +170,40 @@ class Store {
     return id;
   };
 
-  createContract = (type: string, limit: number, premium: number) => {
+  updateBelonging = (id: string, name?: string, value?: number, category?: string) => {
+    let ok = false;
+    this.state.belongings = this.state.belongings.map(b => {
+      if (b.id === id) {
+        ok = true;
+        return {
+          ...b,
+          ...(name !== undefined && { name }),
+          ...(value !== undefined && { value }),
+          ...(category !== undefined && { category }),
+        };
+      }
+      return b;
+    });
+    this.emit();
+    return ok;
+  };
+
+  deleteBelonging = (id: string) => {
+    const initialLength = this.state.belongings.length;
+    this.state.belongings = this.state.belongings.filter(b => b.id !== id);
+    const ok = this.state.belongings.length < initialLength;
+    this.emit();
+    return ok;
+  };
+
+  createContract = (type: string, category: string, limit: number, premium: number) => {
     const id = `POL-${type.split(' ')[0]}-${Math.floor(Math.random() * 9000) + 1000}`;
     this.state.contracts = [
       ...this.state.contracts,
       {
         id,
         type,
+        category,
         coverageLimit: limit,
         deductible: 0, // Simplified for now
         active: true,
@@ -141,20 +214,30 @@ class Store {
     return id;
   };
 
+  deleteContract = (contractId: string) => {
+    const initialLength = this.state.contracts.length;
+    this.state.contracts = this.state.contracts.filter(c => c.id !== contractId);
+    const success = this.state.contracts.length < initialLength;
+    this.emit();
+    return success;
+  };
+
   updateContractLimit = (contractId: string, newLimit: number) => {
     let ok = false;
+    let updatedPremium = 0;
     this.state.contracts = this.state.contracts.map((c) => {
       if (c.id === contractId) {
         ok = true;
-        // Increase premium by 5% of the limit change (simple mock logic)
+        // Use consistent 3% logic, matching the simulateQuote tool
         const diff = newLimit - c.coverageLimit;
-        const newPremium = c.premium + (diff > 0 ? diff * 0.05 : 0);
-        return { ...c, coverageLimit: newLimit, premium: Math.round(newPremium) };
+        const newPremium = c.premium + (diff > 0 ? diff * 0.03 : 0);
+        updatedPremium = Math.round(newPremium);
+        return { ...c, coverageLimit: newLimit, premium: updatedPremium };
       }
       return c;
     });
     this.emit();
-    return ok;
+    return { success: ok, premium: updatedPremium };
   };
 
   simulateQuote = (category: string, totalValue: number) => {

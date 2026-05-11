@@ -62,10 +62,50 @@ const createContractDecl: FunctionDeclaration = {
     type: Type.OBJECT,
     properties: {
       type: { type: Type.STRING, description: "The type/name of the contract (e.g. 'Standalone Jewelry Policy')." },
+      category: { type: Type.STRING, description: "The exact category of belongings this contract covers (e.g. 'Jewelry', 'Electronics')." },
       limit: { type: Type.NUMBER, description: "The coverage limit in USD." },
       premium: { type: Type.NUMBER, description: "The annual premium cost in USD." }
     },
-    required: ["type", "limit", "premium"]
+    required: ["type", "category", "limit", "premium"]
+  }
+};
+
+const deleteContractDecl: FunctionDeclaration = {
+  name: "delete_contract",
+  description: "Deletes or cancels an existing insurance contract from the user's account.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      contractId: { type: Type.STRING, description: "The ID of the contract to delete." }
+    },
+    required: ["contractId"]
+  }
+};
+
+const updateBelongingDecl: FunctionDeclaration = {
+  name: "update_belonging",
+  description: "Updates an existing belonging's details (name, value, or category).",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      id: { type: Type.STRING, description: "The ID of the belonging to update." },
+      name: { type: Type.STRING, description: "The new name/description (optional)." },
+      value: { type: Type.NUMBER, description: "The new estimated value (optional)." },
+      category: { type: Type.STRING, description: "The new category (optional)." }
+    },
+    required: ["id"]
+  }
+};
+
+const deleteBelongingDecl: FunctionDeclaration = {
+  name: "delete_belonging",
+  description: "Deletes a belonging from the user's profile.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      id: { type: Type.STRING, description: "The ID of the belonging to delete." }
+    },
+    required: ["id"]
   }
 };
 
@@ -74,7 +114,7 @@ const internalDocs = `
 - Homeowners Insurance standard limit: $300,000. High-value electronics are covered under general personal property but typically capped at $2,000 per item unless explicitly scheduled.
 - Valuable Personal Property (VPP) Policy (like Jewelry): Requires separate coverage. If a single jewelry item exceeds $5,000, it MUST be scheduled or requires a standalone policy.
 - Coverage Gap Detection: If a user declares an item whose value exceeds the category's per-item limit under their current policy (e.g., a $4000 laptop on a standard home policy), the assistant MUST recommend either increasing the base limit or adding a specific VPP rider.
-- Action Protocol: When recommending an update, offer to simulate a quote. If the user agrees, either update_contract_coverage or create_contract for a new one. Always confirm changes before executing.
+- Action Protocol: When recommending an update, offer to simulate a quote. If the user agrees, either update_contract_coverage, or if an update is problematic for pricing, use delete_contract on the old one and create_contract for a new one. Always confirm changes before executing.
 - Tone: Professional, empathetic, clear. Speak as if talking over a smart speaker. Keep responses relatively concise and highly natural.
 `;
 
@@ -86,9 +126,12 @@ export async function processGeminiTurn(
     getContractsDecl,
     getBelongingsDecl,
     declareBelongingDecl,
+    updateBelongingDecl,
+    deleteBelongingDecl,
     generateQuoteDecl,
     updateContractDecl,
-    createContractDecl
+    createContractDecl,
+    deleteContractDecl
   ];
 
   let currentContents = [...contents];
@@ -99,7 +142,7 @@ export async function processGeminiTurn(
     safetyCounter++;
     
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.1-flash-lite",
       contents: currentContents,
       config: {
         systemInstruction: `You are SafeGuard AI, an intelligent voice-based insurance assistant.\n${internalDocs}`,
@@ -137,17 +180,29 @@ export async function processGeminiTurn(
             const args = call.args as any;
             const newId = store.addBelonging(args.name, args.value, args.category);
             result = { success: true, newId, action: "Belonging declared successfully" };
+          } else if (call.name === "update_belonging") {
+            const args = call.args as any;
+            const ok = store.updateBelonging(args.id, args.name, args.value, args.category);
+            result = { success: ok, message: ok ? "Belonging updated successfully." : "Belonging ID not found." };
+          } else if (call.name === "delete_belonging") {
+            const args = call.args as any;
+            const ok = store.deleteBelonging(args.id);
+            result = { success: ok, message: ok ? "Belonging deleted successfully." : "Belonging ID not found." };
           } else if (call.name === "generate_quote") {
             const args = call.args as any;
             result = store.simulateQuote(args.category, args.totalValue);
           } else if (call.name === "update_contract_coverage") {
             const args = call.args as any;
-            const ok = store.updateContractLimit(args.contractId, args.newLimit);
-            result = { success: ok, message: ok ? "Contract updated." : "Contract ID not found." };
+            const res = store.updateContractLimit(args.contractId, args.newLimit);
+            result = { success: res.success, message: res.success ? `Contract updated. New premium is $${res.premium}` : "Contract ID not found." };
           } else if (call.name === "create_contract") {
             const args = call.args as any;
-            const newId = store.createContract(args.type, args.limit, args.premium);
+            const newId = store.createContract(args.type, args.category, args.limit, args.premium);
             result = { success: true, newId, message: "New contract successfully added." };
+          } else if (call.name === "delete_contract") {
+            const args = call.args as any;
+            const ok = store.deleteContract(args.contractId);
+            result = { success: ok, message: ok ? "Contract cancelled successfully." : "Contract ID not found." };
           } else {
              result = { error: "Unknown function" };
           }
