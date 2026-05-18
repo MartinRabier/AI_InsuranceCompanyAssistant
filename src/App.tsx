@@ -96,10 +96,10 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex overflow-hidden p-4 sm:p-6 gap-6">
+      <main className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden p-4 sm:p-6 gap-6 relative">
         
         {/* Chat Section */}
-        <section className="flex-1 flex flex-col bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden relative">
+        <section className="min-h-[60vh] lg:min-h-0 flex-1 flex flex-col bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden relative shrink-0">
           
           {/* Section Header */}
           <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
@@ -212,12 +212,13 @@ export default function App() {
         <AnimatePresence>
           {showData && (
             <motion.aside
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "20rem", opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              className="flex flex-col gap-6 shrink-0 h-full overflow-hidden hidden lg:block"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col gap-6 shrink-0 lg:h-full lg:overflow-hidden lg:w-[20rem]"
             >
-              <div className="flex flex-col gap-6 overflow-y-auto h-full pb-4 hide-scrollbar w-[20rem] p-1">
+              <div className="flex flex-col gap-6 lg:overflow-y-auto lg:h-full pb-4 hide-scrollbar w-full p-1">
                 
                 
                 {/* RAG Engine */}
