@@ -1,5 +1,5 @@
 {
-  "name": "SafeGuard AI Insurance Assistant",
+  "name": "CerIAse",
   "description": "A voice-first AI assistant for managing insurance contracts, declaring belongings, and assessing coverage gaps using Retrieval-Augmented Generation concepts.",
   "requestFramePermissions": [
     "microphone"

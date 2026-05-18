@@ -83,7 +83,7 @@ export default function App() {
         </div>
         <div className="flex items-center gap-4">
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-xs font-bold uppercase tracking-wider">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full"></span> System Active
+            <span className="w-2 h-2 bg-emerald-500 rounded-full"></span> Système Actif
           </div>
           <button
             onClick={() => setShowData(!showData)}
@@ -106,7 +106,7 @@ export default function App() {
             <div className="flex items-center gap-3">
               <div className={`w-3 h-3 rounded-full ${status === "idle" ? "bg-slate-300" : status === "thinking" ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)] animate-pulse" : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)] animate-pulse"}`}></div>
               <span className="font-mono text-xs font-bold tracking-widest text-slate-500 uppercase">
-                {status === "idle" ? "SYSTEM IDLE" : status === "thinking" ? "PROCESSING..." : "VOICE FEED ACTIVE"}
+                {status === "idle" ? "SYSTÈME PRÊT" : status === "thinking" ? "TRAITEMENT..." : "FLUX AUDIO ACTIF"}
               </span>
             </div>
           </div>
@@ -143,7 +143,7 @@ export default function App() {
               <AnimatePresence>
                 {visibleHistory.length === 0 && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-slate-400 text-sm mt-4">
-                    Generating mock data recommended before starting... <br/> Try saying "What are my current contracts?"
+                    Il est recommandé de générer des données de test avant de commencer... <br/> Essayez de dire "Quels sont mes contrats actuels ?"
                   </motion.div>
                 )}
                 {visibleHistory.map((item, idx) => {
@@ -185,7 +185,7 @@ export default function App() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleSend(inputText);
                   }}
-                  placeholder="Type your message to the AI..."
+                  placeholder="Tapez votre message à l'IA..."
                   disabled={status === "thinking"}
                   className="w-full bg-white border border-slate-300 text-slate-800 shadow-sm rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-sm placeholder:text-slate-400 disabled:opacity-50"
                 />
@@ -202,7 +202,7 @@ export default function App() {
                 className="px-4 py-2 bg-white text-[#07c31a] font-bold border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-colors flex items-center justify-center shrink-0 uppercase tracking-wider text-xs hidden sm:flex"
                 title="Voice input (mocked by text for demo)"
               >
-                <Mic className="mr-2" size={16} /> Push to Talk
+                <Mic className="mr-2" size={16} /> Appuyer pour parler
               </button>
             </div>
           </div>
@@ -223,45 +223,45 @@ export default function App() {
                 {/* RAG Engine */}
                 <div className="bg-emerald-900 rounded-xl p-5 text-white shadow-xl flex flex-col shrink-0">
                   <h3 className="text-xs font-bold text-emerald-300 uppercase mb-4 tracking-wider">
-                  RAG Engine Reasoning
+                  Raisonnement du moteur RAG
                   </h3>
 
                   <div className="bg-emerald-800/50 p-3 rounded-lg border border-emerald-700/50">
                     <p className="text-[10px] text-emerald-400 font-bold uppercase mb-1">
-                      Knowledge Context
+                      Contexte des connaissances
                     </p>
 
                     <p className="text-xs leading-relaxed italic opacity-80">
-                      - Homeowners limits: $300k, $2k per electronics.<br/>
-                      - VPP policy for items &gt; $5k.<br/>
-                      System is actively applying policy documents to natural conversation.
+                      - Limites Habitation: 300k €, 2k € par équipement.<br/>
+                      - Contrat Objets de valeur &gt; 5k €.<br/>
+                      Le système applique les politiques à la conversation naturelle.
                     </p>
                   </div>
                 </div>
                 {/* Testing Suite */}
                 <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm shrink-0">
                   <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider flex items-center gap-2">
-                    Testing Suite
+                    Suite de tests
                   </h3>
                   <button
                     onClick={() => store.generateMockData()}
                     className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-colors rounded-lg mb-3 flex items-center justify-center gap-2 uppercase shadow-sm"
                   >
-                    <span>⚡</span> Generate Mock Data
+                    <span>⚡</span> Générer des données
                   </button>
                   <p className="text-[10px] text-slate-400 text-center leading-tight">
-                    Adds random high-value belongings and generates coherent insurance history.
+                    Ajoute des biens aléatoires et crée un historique fictif.
                   </p>
                 </div>
 
                 {/* Sub-panels */}
                 <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col shrink-0">
                   <h3 className="text-xs font-bold text-slate-400 uppercase mb-4 tracking-wider flex items-center gap-2">
-                    Portfolio
+                    Portefeuille
                   </h3>
                   <div className="space-y-4">
                     {contracts.length === 0 ? (
-                      <p className="text-slate-500 text-sm italic">No contracts found.</p>
+                      <p className="text-slate-500 text-sm italic">Aucun contrat trouvé.</p>
                     ) : (
                       contracts.map((c) => (
                         <div key={c.id} className={`border-l-4 ${c.active ? 'border-indigo-500' : 'border-slate-300'} pl-3`}>
@@ -273,21 +273,21 @@ export default function App() {
                               {c.type}
                             </p>
                             <div className="flex items-center gap-1">
-                              <span className="text-[10px] font-mono text-indigo-600 bg-indigo-50 px-1 py-0.5 rounded border border-indigo-100">${c.premium}/yr</span>
+                              <span className="text-[10px] font-mono text-indigo-600 bg-indigo-50 px-1 py-0.5 rounded border border-indigo-100">{c.premium} €/an</span>
                               <ChevronDown size={14} className={`text-slate-400 transition-transform ${expandedContract === c.id ? 'rotate-180' : ''}`} />
                             </div>
                           </div>
                           {expandedContract === c.id ? (
                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="text-xs text-slate-600 mt-2 space-y-1 overflow-hidden bg-slate-50 p-2 rounded border border-slate-100">
                               <div className="flex justify-between"><span className="font-semibold text-slate-400">ID</span><span className="font-mono text-[10px]">{c.id}</span></div>
-                              <div className="flex justify-between"><span className="font-semibold text-slate-400">Limit</span><span>${c.coverageLimit.toLocaleString()}</span></div>
-                              <div className="flex justify-between"><span className="font-semibold text-slate-400">Deductible</span><span>${c.deductible.toLocaleString()}</span></div>
-                              <div className="flex justify-between"><span className="font-semibold text-slate-400">Status</span><span className={c.active ? 'text-emerald-500 font-medium' : 'text-slate-400'}>{c.active ? 'Active' : 'Inactive'}</span></div>
+                              <div className="flex justify-between"><span className="font-semibold text-slate-400">Limite</span><span>{c.coverageLimit.toLocaleString()} €</span></div>
+                              <div className="flex justify-between"><span className="font-semibold text-slate-400">Franchise</span><span>{c.deductible.toLocaleString()} €</span></div>
+                              <div className="flex justify-between"><span className="font-semibold text-slate-400">Statut</span><span className={c.active ? 'text-emerald-500 font-medium' : 'text-slate-400'}>{c.active ? 'Actif' : 'Inactif'}</span></div>
                             </motion.div>
                           ) : (
                             <div className="flex justify-between text-xs text-slate-500 mt-1 pl-1">
                               <span className="font-mono truncate max-w-[80px]">{c.id}</span>
-                              <span>Limit: ${c.coverageLimit.toLocaleString()}</span>
+                              <span>Limite: {c.coverageLimit.toLocaleString()} €</span>
                             </div>
                           )}
                         </div>
@@ -297,22 +297,22 @@ export default function App() {
                   
                   <div className="mt-6 pt-5 border-t border-slate-100">
                     <p className="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider flex items-center justify-between">
-                      Declared Belongings
-                      {belongings.length > 0 && <span className="p-1 px-2 bg-slate-100 rounded text-[10px] text-slate-500">{belongings.length} items</span>}
+                      Biens Déclarés
+                      {belongings.length > 0 && <span className="p-1 px-2 bg-slate-100 rounded text-[10px] text-slate-500">{belongings.length} biens</span>}
                     </p>
                     <ul className="text-sm space-y-3">
                       {belongings.length === 0 ? (
-                        <li className="text-slate-500 text-sm italic">No belongings declared.</li>
+                        <li className="text-slate-500 text-sm italic">Aucun bien déclaré.</li>
                       ) : (
                         belongings.map((b) => (
                           <li key={b.id} className="flex items-center justify-between group">
                             <div className="flex items-center gap-2 truncate pr-2">
-                              {b.coverageStatus === 'covered' && <Shield size={14} className="text-emerald-500 shrink-0" title="Covered" />}
-                              {b.coverageStatus === 'partial' && <ShieldAlert size={14} className="text-amber-500 shrink-0" title="Partially Covered" />}
-                              {b.coverageStatus === 'not_covered' && <ShieldX size={14} className="text-red-400 shrink-0" title="Not Covered" />}
+                              {b.coverageStatus === 'covered' && <Shield size={14} className="text-emerald-500 shrink-0" title="Couvert" />}
+                              {b.coverageStatus === 'partial' && <ShieldAlert size={14} className="text-amber-500 shrink-0" title="Partiellement Couvert" />}
+                              {b.coverageStatus === 'not_covered' && <ShieldX size={14} className="text-red-400 shrink-0" title="Non Couvert" />}
                               <span className="text-slate-700 font-medium truncate group-hover:text-indigo-600 transition-colors cursor-default" title={`${b.name} (${b.category})`}>{b.name}</span>
                             </div>
-                            <span className="text-slate-500 font-mono text-xs shrink-0">${b.value.toLocaleString()}</span>
+                            <span className="text-slate-500 font-mono text-xs shrink-0">{b.value.toLocaleString()} €</span>
                           </li>
                         ))
                       )}

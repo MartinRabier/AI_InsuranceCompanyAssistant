@@ -46,14 +46,17 @@ class Store {
   };
 
   getBelongingsWithCoverage = (): BelongingWithCoverage[] => {
-    const hasHomeowners = this.state.contracts.some(c => c.type.toLowerCase().includes("home"));
+    const hasHomeowners = this.state.contracts.some(c => {
+      const t = c.type.toLowerCase();
+      return t.includes("home") || t.includes("habitation");
+    });
     
     // Dynamically calculate specific coverage per category
     const categoryLimits: Record<string, number> = {};
     for (const c of this.state.contracts) {
        const typeLower = c.type.toLowerCase();
        // If it's a specific item/category policy (not general homeowners)
-       if (!typeLower.includes("home")) {
+       if (!typeLower.includes("home") && !typeLower.includes("habitation")) {
           const matchedCats = new Set<string>();
           if (c.category) {
             matchedCats.add(c.category.toLowerCase());
@@ -97,7 +100,7 @@ class Store {
          }
       } else if (hasHomeowners) {
          // Fallback default homeowners rules based on internal docs
-         if (catLower === "jewelry" && b.value > 5000) {
+         if ((catLower === "jewelry" || catLower === "bijoux") && b.value > 5000) {
             status = 'not_covered'; // Must be scheduled
          } else if (b.value <= 2000) {
             status = 'covered'; // Standard limits for items
@@ -119,17 +122,17 @@ class Store {
     this.state = {
       contracts: [
         {
-          id: "POL-Home-1092",
-          type: "Homeowners Insurance",
+          id: "POL-Habitation-1092",
+          type: "Assurance Habitation",
           coverageLimit: 350000,
           deductible: 1000,
           active: true,
           premium: 1250,
         },
         {
-          id: "POL-Jewelry-5441",
-          type: "Valuable Personal Property (Jewelry)",
-          category: "Jewelry",
+          id: "POL-Bijoux-5441",
+          type: "Contrat Objets de valeur (Bijoux)",
+          category: "Bijoux",
           coverageLimit: 5000,
           deductible: 0,
           active: true,
@@ -141,19 +144,19 @@ class Store {
           id: "BEL-101",
           name: "MacBook Pro M3 Max",
           value: 3999,
-          category: "Electronics",
+          category: "Électronique",
         },
         {
           id: "BEL-102",
-          name: "Diamond Engagement Ring",
+          name: "Bague de fiançailles en diamant",
           value: 6500,
-          category: "Jewelry",
+          category: "Bijoux",
         },
         {
           id: "BEL-103",
-          name: "Sony A7IV Camera",
+          name: "Appareil photo Sony A7IV",
           value: 1500,
-          category: "Electronics",
+          category: "Électronique",
         },
       ],
     };
